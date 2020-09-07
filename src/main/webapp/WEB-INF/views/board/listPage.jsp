@@ -27,7 +27,7 @@
                 	
                 	<tr>
                 		<td>${boardVO.bno}</td>
-                		<td><a href='/board/read?bno=${boardVO.bno}'>${boardVO.title}</a></td>
+                		<td><a href='/board/readPage${pageMaker.makeQuery(pageMaker.cri.page) }&bno=${boardVO.bno}'>${boardVO.title}</a></td>
                 		<td>${boardVO.writer}</td>
                 		<td><fmt:formatDate pattern="yyyy-MM-dd HH:mm"
                 		value="${boardVO.regdate}" /></td>
@@ -36,12 +36,14 @@
                 	
                 </c:forEach>
                 </table>
+                
+                
 				
 				<div class="row justify-content-center">
                 <div class="dataTables_paginate paging_simple_numbers" id="example2_paginate">
                 	<ul class="pagination">
                 		<c:if test="${pageMaker.prev}">
-                			<li class="paginate_button page-item"><a href="listPage?page=${pageMaker.startPage - 1}" class="page-link">&laquo;</a></li>
+                			<li class="paginate_button page-item"><a href="listPage?${pageMaker.makeQuery(pageMaker.startPage - 1)}" class="page-link">&laquo;</a></li>
                 		</c:if>
                 		
                 		<c:forEach begin="${pageMaker.startPage }"
@@ -49,21 +51,26 @@
                 			<c:choose>
 	                			<c:when test="${pageMaker.cri.page == idx }">
 	                				<li class="paginate_button page-item active">
+	                				<a href="${idx}" class="page-link">${idx }</a></li>
 	                			</c:when>
 	                			<c:otherwise>
 	                				<li class="paginate_button page-item">
+	                				<a href="${idx}" class="page-link">${idx }</a></li>
 	                			</c:otherwise>
                 			</c:choose>
-                				<a href="listPage?page=${idx }" class="page-link">${idx }</a>
-                			</li>
                 		</c:forEach>
                 		
                 		<c:if test="${pageMaker.next && pageMaker.endPage > 0 }">
-                			<li class="paginate_button page-item"><a href="listPage?page=${pageMaker.endPage + 1 }" class="page-link">&raquo;</a></li>
+                			<li class="paginate_button page-item"><a href="listPage?${pageMaker.makeQuery(pageMaker.endPage + 1) }" class="page-link">&raquo;</a></li>
                 		</c:if>
                 	</ul>
                 </div>
                 </div>
+                <form id="jobForm">
+				  	<input type='hidden' name="page" value=${pageMaker.cri.page }>
+					<input type='hidden' name="perPageNum" value=${pageMaker.cri.perPageNum }>
+				</form>
+                
                 </div>
 
                 </div>
@@ -85,6 +92,24 @@
 	if (result == 'success') {
 		alert("처리가 완료되었습니다.");
 	}
+
+	$(document).ready(function() {
+	
+		$(".pagination li a").on("click", function(event) {
+			
+			event.preventDefault();
+			
+			var targetPage = $(this).attr("href");
+			
+			var jobForm = $("#jobForm");
+			jobForm.find("[name='page']").val(targetPage);
+			jobForm.attr("action", "/board/listPage").attr("method", "get");
+			jobForm.submit();
+			
+		});
+		
+	});
+	
   </script>
 
 <%@include file="../include/footer.jsp" %>
