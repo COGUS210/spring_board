@@ -139,7 +139,6 @@ public class BoardController {
 	public void modifyPagingGet(@RequestParam("bno") int bno, @ModelAttribute("cri") Criteria cri, Model model) throws Exception {
 		
 		model.addAttribute(service.read(bno));
-		logger.info("aaaaaaaaaaaaaaaaaaaaaa");
 		
 	}
 	

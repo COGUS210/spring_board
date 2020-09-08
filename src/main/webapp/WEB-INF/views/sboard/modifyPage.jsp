@@ -21,6 +21,8 @@
 					<form role="form" action="modifyPage" method="post">
 						<input type='hidden' name='page' value="${cri.page }"> <input
 							type='hidden' name='perPageNum' value="${cri.perPageNum }">
+						<input type='hidden' name='searchType' value="${cri.searchType }">
+						<input type='hidden' name='keyword' value="${cri.keyword }">
 
 						<div class="card-body">
 							<div class="form-group">
@@ -63,26 +65,20 @@
 <!-- /.content-wrapper -->
 
 <script>
-	$(document)
-			.ready(
-					function() {
+	$(document).ready( function() {
+		
+		var formObj = $("form[role='form']");
+		console.log(formObj);
 
-						var formObj = $("form[role='form']");
+		$(".btn-warning").on("click", function() {
+			self.location = "/board/listPage?page=${cri.page}&perPageNum=${cri.perPageNum}" + "&searchType=${cri.searchType}&keyword=${cri.keyword}";
+		});
 
-						console.log(formObj);
+		$(".btn-primary").on("click", function() {
+			formObj.submit();
+		});
 
-						$(".btn-warning")
-								.on(
-										"click",
-										function() {
-											self.location = "/board/listPage?page=${cri.page}&perPageNum=${cri.perPageNum}";
-										});
-
-						$(".btn-primary").on("click", function() {
-							formObj.submit();
-						});
-
-					});
+	});
 </script>
 
 <%@include file="../include/footer.jsp"%>

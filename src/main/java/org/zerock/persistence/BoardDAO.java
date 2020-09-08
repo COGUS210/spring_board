@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.zerock.domain.BoardVO;
 import org.zerock.domain.Criteria;
+import org.zerock.domain.SearchCriteria;
 
 public interface BoardDAO {
 
@@ -23,4 +24,7 @@ public interface BoardDAO {
 	
 	public int countPaging(Criteria cri) throws Exception;
 	
+	public List<BoardVO> listSearch(SearchCriteria cri) throws Exception;
+	
+	public int listSearchCount(SearchCriteria cri) throws Exception;
 }
