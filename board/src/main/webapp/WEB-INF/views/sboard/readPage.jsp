@@ -41,9 +41,9 @@
 					<!-- /.card-body -->
 
 					<div class="card-footer">
-						<button type="submit" class="btn btn-warning modifyBtn">MODIFY</button>
-						<button type="submit" class="btn btn-danger removeBtn">REMOVE</button>
-						<button type="submit" class="btn btn-primary goListBtn">GO
+						<button type="submit" id="modifyBtn" class="btn btn-warning">MODIFY</button>
+						<button type="submit" id="removeBtn" class="btn btn-danger">REMOVE</button>
+						<button type="submit" id="goListBtn" class="btn btn-primary">GO
 							LIST</button>
 					</div>
 
@@ -83,41 +83,73 @@
 		</div>
 		
 		<!-- The time line -->
-		<ul class="timeline">
+		<div class="row">
+		<div class="col-md-12">
+		<div class="timeline">
 			<!-- timeline time label -->
-			<li class="time-label" id="repliesDiv"><span class="bg-green">
-				Replies List </span></li>
-		</ul>
+			<div class="time-label" id="repliesDiv"><span class="bg-green">
+				Replies List </span></div>
+				
+			<div id="reply">
 		
-		<div class="text-center">
-			<ul id="pagination" class="pagination pagination-sm no-margin">
-			</ul>
+			<script id="template" type="text/x-handlebars-template">
+				{{#each .}}
+					<div class="replyLi" data-rno={{rno}}>
+						<i class="fas fa-comments bg-yellow"></i>
+							<div class="timeline-item">
+								<span class="time">
+									<i class="fas fa-clock"></i>{{prettifyDate regdate}}
+								</span>
+								<h3 class="timeline-header"><strong>{{rno}}</strong> -{{replyer}}</h3>
+								<div class="timeline-body">{{replytext}}</div>
+									<div class="timeline-footer">
+									<a class="btn btn-primary btn-xs"
+									data-toggle="modal" data-target="#modifyModal">Modify</a>					
+							</div>
+						</div>
+					</div>
+				{{/each}}
+			</script>
+			</div>
+			
+			<div>
+				<i class="fas fa-clock bg-gray"></i>
+			</div>
+			
+		</div>
+		</div>
 		</div>
 		
-		<script id="template" type="text/x-handlebars-template">
-		{{#each .}}
-		<li class="replyLi" data-rno={{rno}}>
-		<i class="fa fa-comments bg-blue"></i>
-			<div class="timeline-item">
-				<span class="time>
-					<i class="fa fa-clock-o"></i>{{prettifyDate regdate}}
-				</span>
-				<h3 class="timeline-header"><strong>{{rno}}</strong> -{{replyer}}</h3>
-				<div class="timeline-body">{{replytext}}</div>
-					<div class="timeline-footer">
-					<a class="btn btn-primary btn-xs"
-					data-toggle="modal" data-target="#modifyModal">Modify</a>
-				</div>
-			</div>
-		</li>
-		{{/each}}
-		</script>
+		<!-- Modal -->
+		<div id="modifyModal" class="modal modal-primary fade" role="dialog">
+			 <div class="modal-dialog">
+			 	<!-- Modal content -->
+			 	<div class="modal-content">
+			 		<div class="modal-header">
+			 			<h4 class="modal-title"></h4>
+			 			<button type="button" class="close" data-dismiss="modal">&times;</button>
+			 		</div>
+			 		<div class="modal-body" data-rno>
+			 			<p><input type="text" id="replytext" class="form-control"></p>
+			 		</div>
+			 		<div class="modal-footer">
+			 			<button type="button" class="btn btn-info" id="replyModBtn">Modify</button>
+			 			<button type="button" class="btn btn-danger" id="replyDelBtn">DELETE</button>
+			 			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			 		</div>
+			 	</div>
+			 </div>
+		</div>
+		
+
 		
 	</div>
 	<!-- /.container-fluid -->
 </div>
 <!-- /.content -->
 </div>
+
+
 
 <script>
 	Handlebars.registerHelper("prettifyDate", function(timeValue) {
@@ -127,20 +159,22 @@
 		var date = dateObj.getDate();
 		return year+"/"+month+"/"+date;
 	});
+	
 	var printData = function(replyArr, target, templateObject){
-		var template = Handlebars.compile(templateObj.html());
+		var template = Handlebars.compile(templateObject.html());
 		var html = template(replyArr);
 		$(".replyLi").remove();
 		target.after(html);
 	}
 	
-	var bno = ${boardVo.bno};
+	var bno = ${boardVO.bno};
 	var replyPage = 1;
+	getPage("/replies/"+bno+"/"+replyPage);
 	
 	function getPage(pageInfo) {
 		$.getJSON(pageInfo, function(data){
-			printData(data.list, $("#repliesDiv"), $('#template'));
-			printPaging(data.pageMaker, $(".pagination"));
+			printData(data.list, $("#reply") ,$('#template'));
+			//printPaging(data.pageMaker, $(".pagination"));
 			
 			$("#modifyModal").modal('hide');
 		});
@@ -155,15 +189,26 @@
 		
 		for (var i=pageMaker.startPage, len=pageMaker.endPage; i<=len; i++) {
 			var strClass=pageMaker.cri.page == i?'class=active':'';
-			str += "<li "+strClass+ "><a href='"+i+"'</a></li>";
+			str += "<li "+strClass+ "><a href='"+i+"'>"+i+"</a></li>";
 		}
 		
 		if (pageMaker.next){
-			str += "<li><a href='"+(pageMAker.endPage+1)+"'> >> </a><li>";
+			str += "<li><a href='"+(pageMaker.endPage+1)+"'> >> </a><li>";
 		}
 		
 		target.html(str);
 	};
+
+	/*
+	var source = $("#template").html();
+	var template = Handlebars.compile(source);
+	var data = [
+		{rno: 1, replytext: '111111', regdate: new Date(), replyer: 'aaa'}
+	];
+	$("#pagination").html(template(data));
+	*/
+	
+	
 	
 	$(document).ready(function() {
 
@@ -171,20 +216,23 @@
 
 		console.log(formObj);
 
-		$(".btn-warning").on("click", function() {
+		$("#modifyBtn").on("click", function() {
 			formObj.attr("action", "/sboard/modifyPage");
 			formObj.attr("method", "get");
 			formObj.submit();
 		});
-		$(".btn-primary").on("click", function() {
+		$("#goListBtn").on("click", function() {
 			formObj.attr("method", "get");
 			formObj.attr("action", "/sboard/list");
 			formObj.submit();
 		});
-		$(".btn-danger").on("click", function() {
+		$("#removeBtn").on("click", function() {
 			formObj.attr("action", "/sboard/removePage");
 			formObj.submit();
 		});
+		
+		
+
 		$("#repliesDiv").on("click", function() {
 			if ($(".timeline li").size() > 1) {
 				return;
@@ -223,6 +271,56 @@
 				}
 			});
 		});
+		
+		$(".timeline").on("click", ".replyLi", function(event) {
+			var reply = $(this);
+			$("#replytext").val(reply.find('.timeline-body').text());
+			$(".modal-title").html(reply.attr("data-rno"));
+		});
+		
+		$("#replyModBtn").on("click", function(){
+			var rno = $(".modal-title").html();
+			var replytext = $("#replytext").val();
+			$.ajax({
+				type:'put',
+				url:'/replies/'+rno,
+				headers:{
+					"Content-Type":"application/json",
+					"X-HTTP-Method-Override": "PUT"
+				},
+				data:JSON.stringify({replytext:replytext}),
+				dataType:'text',
+				success:function(result){
+					console.log("result: " + result);
+					if (result == 'SUCCESS'){
+						alert("수정 되었습니다.");
+						getPage("/replies/"+bno+"/"+replyPage);
+					}
+				}
+			});
+		});
+		$("#replyDelBtn").on("click", function(){
+			var rno = $(".modal-title").html();
+			var replytext = $("#replytext").val();
+			
+			$.ajax({
+				type:'delete',
+				url:'/replies/'+rno,
+				headers:{
+					"Content-Type":"application/json",
+					"X-HTTP-Method-Override": "DELETE"
+				},
+				dataType:'text',
+				success:function(result){
+					console.log("result: " + result);
+					if (result == 'SUCCESS'){
+						alert("삭제 되었습니다.");
+						getPage("/replies/"+bno+"/"+replyPage);
+					}
+				}
+			});
+		});
+		
 
 	});
 </script>
