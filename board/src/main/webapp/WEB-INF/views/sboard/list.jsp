@@ -87,7 +87,7 @@
 									<ul class="pagination">
 										<c:if test="${pageMaker.prev}">
 											<li class="paginate_button page-item"><a
-												href="listPage?${pageMaker.makeSearch(pageMaker.startPage - 1)}"
+												href="list${pageMaker.makeSearch(pageMaker.startPage - 1)}"
 												class="page-link">&laquo;</a></li>
 										</c:if>
 
@@ -108,7 +108,7 @@
 
 										<c:if test="${pageMaker.next && pageMaker.endPage > 0 }">
 											<li class="paginate_button page-item"><a
-												href="listPage?${pageMaker.makeSearch(pageMaker.endPage + 1) }"
+												href="list${pageMaker.makeSearch(pageMaker.endPage + 1) }"
 												class="page-link">&raquo;</a></li>
 										</c:if>
 									</ul>
