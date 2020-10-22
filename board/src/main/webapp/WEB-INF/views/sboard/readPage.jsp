@@ -88,7 +88,7 @@
 		<div class="timeline">
 			<!-- timeline time label -->
 			<div class="time-label" id="repliesDiv"><span class="bg-green">
-				Replies List </span></div>
+				Replies List  <small id='replycntSmall'>  [${boardVO.replycnt}]  </small></span></div>
 				
 			<div id="reply">
 		
@@ -177,6 +177,7 @@
 			//printPaging(data.pageMaker, $(".pagination"));
 			
 			$("#modifyModal").modal('hide');
+			$("#replycntSmall").html("[ " + data.pageMaker.totalCount + " ]");
 		});
 	}
 	
