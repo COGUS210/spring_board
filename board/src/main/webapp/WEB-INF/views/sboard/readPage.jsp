@@ -1,5 +1,5 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ page session="false"%>
+<%@ page session="true"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
@@ -39,13 +39,20 @@
 						</div>
 					</div>
 					<!-- /.card-body -->
-
+					
+					<ul class="mailbox-attachments clearfix uploadedList">
+					</ul>
+					
 					<div class="card-footer">
+					<c:if test="${login.uid == boardVO.writer }">
 						<button type="submit" id="modifyBtn" class="btn btn-warning">MODIFY</button>
 						<button type="submit" id="removeBtn" class="btn btn-danger">REMOVE</button>
+					</c:if>
 						<button type="submit" id="goListBtn" class="btn btn-primary">GO
 							LIST</button>
+
 					</div>
+					
 
 					<form role="form" action="modifyPage" method="post">
 						<input type='hidden' name='bno' value="${boardVO.bno }"> <input
@@ -67,9 +74,11 @@
 					<div class="card-header">
 						<h3 class="card-title">ADD NEW REPLY</h3>
 					</div>
+					<c:if test="${not empty login }">
 					<div class="card-body">
 						<label for="newReplyWriter">Writer</label>
-							<input class="form-control" type="text" placeholder="USER ID" id="newReplyWriter"><br>
+							<input class="form-control" type="text" placeholder="USER ID" id="newReplyWriter"
+							value="${login.uid }" readonly="readonly"><br>
 							
 						<label for="newReplyText">ReplyText</label>
 							<input class="form-control" type="text" placeholder="REPLY TEXT" id="newReplyText">
@@ -78,6 +87,14 @@
 					<div class="card-footer">
 						<button type="submit" class="btn btn-primary" id="replyAddBtn">ADD REPLY</button>
 					</div>
+					</c:if>
+					
+					<c:if test="${empty login }">
+						<div class="card-body">
+							<div><a href="../user/login">Login Please</a></div>
+						</div>
+					</c:if>
+					
 				</div>
 			</div>
 		</div>
@@ -103,8 +120,10 @@
 								<h3 class="timeline-header"><strong>{{rno}}</strong> -{{replyer}}</h3>
 								<div class="timeline-body">{{replytext}}</div>
 									<div class="timeline-footer">
+									{{#eqReplyer replyer }}
 									<a class="btn btn-primary btn-xs"
-									data-toggle="modal" data-target="#modifyModal">Modify</a>					
+									data-toggle="modal" data-target="#modifyModal">Modify</a>
+									{{/eqReplyer}}			
 							</div>
 						</div>
 					</div>
@@ -152,6 +171,14 @@
 
 
 <script>
+	Handlebars.registerHelper("eqReplyer", function(replyer, block) {
+		var accum = '';
+		if (replyer == '${login.uid}') {
+			accum += block.fn();
+		}
+		return accum;
+	});
+
 	Handlebars.registerHelper("prettifyDate", function(timeValue) {
 		var dateObj = new Date(timeValue);
 		var year = dateObj.getFullYear();
